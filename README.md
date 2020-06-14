@@ -2,7 +2,7 @@
 
 A step by step tutorial for configuration TailwindCSS with Angular application.
 
-![How to configure TailwindCSS with Angular][step7](https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-07.gif)]
+![How to configure TailwindCSS with Angular](https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-07.gif)
 
 https://trungk18.com/experience/configure-tailwind-css-with-angular
 
