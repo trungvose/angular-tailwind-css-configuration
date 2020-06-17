@@ -19,6 +19,8 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
     - [2. Install TailwindCSS package and dependencies needed](#2-install-tailwindcss-package-and-dependencies-needed)
     - [3. Import Tailwind CSS to your style.scss](#3-import-tailwind-css-to-your-stylescss)
     - [4. Create a webpack.config.js file at the root of your project](#4-create-a-webpackconfigjs-file-at-the-root-of-your-project)
+      - [@fullhuman/postcss-purgecss](#fullhumanpostcss-purgecss)
+      - [postcss-scss](#postcss-scss)
     - [5. Modify the angular.json file to use the custom builder and the webpack config file](#5-modify-the-angularjson-file-to-use-the-custom-builder-and-the-webpack-config-file)
     - [6. We are finished](#6-we-are-finished)
   - [Configure to use TailwindCSS effectively in VSCode](#configure-to-use-tailwindcss-effectively-in-vscode)
@@ -162,7 +164,43 @@ module.exports = {
 };
 ```
 
-**Important**: We need [`@fullhuman/postcss-purgecss`][postcss-purgecss] plugin to remove <u>unused CSS class</u> from Tailwind. If you don't include that plugin, it will result in a massive bundle size of CSS.
+#### @fullhuman/postcss-purgecss
+
+We need `@fullhuman/postcss-purgecss` plugin to remove <u>unused CSS class</u> from Tailwind. If you don't include that plugin, it will result in a massive bundle size of CSS.
+But it could be dangerous if you are using other library/framework together with `Tailwind`. It could erase these framework classes that you imported.
+
+```scss
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@import "ng-zorro-antd/style/index.css";
+@import "ng-zorro-antd/tooltip/style/index.css";
+```
+
+The CSS from `ng-zorro` was gone in my project.
+
+To whitelist the `ng-zorro` css, install `purgecss-whitelister` by doing. See more on [github][whitelister]
+
+```
+npm i purgecss-whitelister -D
+```
+
+And update the `webpack.config.js` with the whitelist to the CSS you to skipped from PurgeCSS
+
+```javascript
+require("@fullhuman/postcss-purgecss")({
+  content: ["./src/**/*.html", "./src/**/*.ts"],
+  whitelist: whitelister([
+    "./node_modules/ng-zorro-antd/style/index.css",
+    "./node_modules/ng-zorro-antd/tooltip/style/index.css",
+  ]),
+});
+```
+
+#### postcss-scss
+
+It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `variables` as properties, so that PostCSS plugins can then transform SCSS source code alongside CSS. Mixin and for loop won't be transformed. I tried to add `sass-loader`. But when I do for loop, it only transform the first and the last item of the list. Super weird :))
 
 <details>
 <summary>View the screenshot - See the CSS bundle size different between <u>1 MB</u> and <u>2 KB</u></summary>
@@ -170,6 +208,7 @@ module.exports = {
 <img alt="How to configure TailwindCSS with Angular" src="https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-10.png">
 
 </details>
+<br/>
 
 I am using `postcss-loader` for webpack instead of just purely `scss-loader`. But you might ask, [what is different between SCSS and PostCSS][scssandpostcss]?
 
@@ -207,7 +246,7 @@ I am using `postcss-loader` for webpack instead of just purely `scss-loader`. Bu
 }
 ```
 
-**Important**, see the `"builder"` has been changed from `@angular-devkit/build-angular:dev-server` to `@angular-builders/custom-webpack:browser`.
+> **Important**, see the `"builder"` has been changed from `@angular-devkit/build-angular:dev-server` to `@angular-builders/custom-webpack:browser`.
 
 ![How to configure TailwindCSS with Angular][step5]
 
@@ -308,3 +347,4 @@ https://github.com/trungk18/angular-tailwind-css-configuration
 [step9]: https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-09.png
 [scssandpostcss]: https://hashnode.com/post/difference-of-postcss-and-scss-cjaw5cm0f02nuxmwtl4qrk5sj
 [postcss-purgecss]: https://github.com/FullHuman/purgecss/tree/master/packages/postcss-purgecss
+[whitelister]: https://github.com/qodesmith/purgecss-whitelister
