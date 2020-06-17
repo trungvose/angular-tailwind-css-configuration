@@ -4,6 +4,8 @@ A step by step tutorial for configuration TailwindCSS with Angular application.
 
 ![How to configure TailwindCSS with Angular](https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-07.gif)
 
+I also post this tutorial on my personal blog page. 
+
 https://trungk18.com/experience/configure-tailwind-css-with-angular
 
 TL;DR: This configuration is tested on Angular 9. It is also working on the previous version of Angular such as 8.x.x. It is also working with AOT when you do `ng build --aot=true`
