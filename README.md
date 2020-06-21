@@ -21,7 +21,7 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
     - [2. Install TailwindCSS package and dependencies needed](#2-install-tailwindcss-package-and-dependencies-needed)
     - [3. Import Tailwind CSS to your style.scss](#3-import-tailwind-css-to-your-stylescss)
     - [4. Create a webpack.config.js file at the root of your project](#4-create-a-webpackconfigjs-file-at-the-root-of-your-project)
-      - [@fullhuman/postcss-purgecss](#fullhumanpostcss-purgecss)
+      - [Controlling file size with Tailwind](#controlling-file-size-with-tailwind)
       - [postcss-scss](#postcss-scss)
     - [5. Modify the angular.json file to use the custom builder and the webpack config file](#5-modify-the-angularjson-file-to-use-the-custom-builder-and-the-webpack-config-file)
     - [6. We are finished](#6-we-are-finished)
@@ -49,7 +49,8 @@ I have a few options for doing so.
 ### 2. Create a new class for each element, such as
 
 ```html
-<button class="my-button">Submit</button> <i class="fa fa-help my-icon"></i>
+<button class="my-button">Submit</button>
+<i class="fa fa-help my-icon"></i>
 ```
 
 And write a corresponding CSS for them.
@@ -82,7 +83,7 @@ If you see they are <u>repeating again and again</u> on a different component, I
 
 If I need a `padding-left: 10px`, I can just add new class `.pl-2 { padding-left: 10px }` to `app.component.scss`. In real life I will use SCSS loop to generate them, but let assume I do it manually for now.
 
-It is convenience, but <u>Many problems</u> arise with this approach
+It is convenience, but <u>many problems</u> arise with this approach
 
 - How to document these comment CSS so that all the team member can use.
 - If your team member needs a style that doesn't have a corresponding class, and he add a new one that doesn't follow your team standard. People might not know about that. It might also create duplication in the future.
@@ -112,7 +113,7 @@ On Windows, simple type `cd path/to/your/folder`.
 ### 2. Install TailwindCSS package and dependencies needed
 
 ```bash
-npm i tailwindcss postcss-scss postcss-import postcss-loader @angular-builders/custom-webpack @fullhuman/postcss-purgecss -D
+npm i tailwindcss postcss-scss postcss-import postcss-loader @angular-builders/custom-webpack -D
 ```
 
 We will need `@angular-builders/custom-webpack` for customizing the build process of Angular CLI by overriding some of the webpack configurations.
@@ -153,11 +154,7 @@ module.exports = {
           plugins: () => [
             require("postcss-import"),
             require("tailwindcss"),
-            require("autoprefixer"),
-            require("@fullhuman/postcss-purgecss")({
-              // Specify the paths to all of the template files in your project
-              content: ["./src/**/*.html", "./src/**/*.ts"],
-            }),
+            require("autoprefixer")            
           ],
         },
       },
@@ -166,43 +163,28 @@ module.exports = {
 };
 ```
 
-#### @fullhuman/postcss-purgecss
+>  I have some notes on `Tailwind bundle size` and `postcss-scss` for you
 
-We need `@fullhuman/postcss-purgecss` plugin to remove <u>unused CSS class</u> from Tailwind. If you don't include that plugin, it will result in a massive bundle size of CSS.
-But it could be dangerous if you are using other library/framework together with `Tailwind`. It could erase these framework classes that you imported.
+#### Controlling file size with Tailwind
 
-```scss
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+Using the default configuration, the development build of Tailwind CSS is **1996kb** uncompressed, **144.6kb** minified and compressed with Gzip, and **37.kb** when compressed with Brotli.
 
-@import "ng-zorro-antd/style/index.css";
-@import "ng-zorro-antd/tooltip/style/index.css";
+When building for production, you should always use Tailwind's purge option to tree-shake unused styles and optimize your final build size. When removing unused styles with Tailwind, it's very hard to end up with more than 10kb of compressed CSS.
+
+To enable purge, simple add this option in your `tailwind.config.js`
+
+```js
+// tailwind.config.js
+module.exports = {
+  purge: {
+    enabled: true,
+    content: ['./src/**/*.html', './src/**/*.ts'],
+  },
+  // ...
+}
 ```
 
-The CSS from `ng-zorro` was gone in my project.
-
-To whitelist the `ng-zorro` css, install `purgecss-whitelister` by doing. See more on [github][whitelister]
-
-```
-npm i purgecss-whitelister -D
-```
-
-And update the `webpack.config.js` with the whitelist to the CSS you to skipped from PurgeCSS
-
-```javascript
-require("@fullhuman/postcss-purgecss")({
-  content: ["./src/**/*.html", "./src/**/*.ts"],
-  whitelist: whitelister([
-    "./node_modules/ng-zorro-antd/style/index.css",
-    "./node_modules/ng-zorro-antd/tooltip/style/index.css",
-  ]),
-});
-```
-
-#### postcss-scss
-
-It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `variables` as properties, so that PostCSS plugins can then transform SCSS source code alongside CSS. Mixin and for loop won't be transformed. I tried to add `sass-loader`. But when I do for loop, it only transform the first and the last item of the list. Super weird :))
+For more on that, [view Tailwind documentation][purge].
 
 <details>
 <summary>View the screenshot - See the CSS bundle size different between <u>1 MB</u> and <u>2 KB</u></summary>
@@ -210,7 +192,11 @@ It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `v
 <img alt="How to configure TailwindCSS with Angular" src="https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-10.png">
 
 </details>
-<br/>
+
+
+#### postcss-scss
+
+It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `variables` as properties, so that PostCSS plugins can then transform SCSS source code alongside CSS. Mixin and for loop won't be transformed. I tried to add `sass-loader`. But when I do for loop, it only transform the first and the last item of the list. Super weird :))
 
 I am using `postcss-loader` for webpack instead of just purely `scss-loader`. But you might ask, [what is different between SCSS and PostCSS][scssandpostcss]?
 
@@ -248,7 +234,7 @@ I am using `postcss-loader` for webpack instead of just purely `scss-loader`. Bu
 }
 ```
 
-> **Important**, see the `"builder"` has been changed from `@angular-devkit/build-angular:dev-server` to `@angular-builders/custom-webpack:browser`.
+**Important**, see the `"builder"` has been changed from `@angular-devkit/build-angular:dev-server` to `@angular-builders/custom-webpack:browser`.
 
 ![How to configure TailwindCSS with Angular][step5]
 
@@ -327,7 +313,7 @@ https://github.com/trungk18/angular-tailwind-css-configuration
 
 - I have tested using Angular version `"@angular/core": "~9.1.11"`. It is working with the previous version of Angular such as `8.x.x` as well.
 - It is also <u>working</u> with AOT when you do `ng build --aot=true`.
-- It will increase your bundle size. But if you are using [`fullhuman/postcss-purgecss`][postcss-purgecss], it will not be significant.
+- It will increase your bundle size, you should always configure [`purge`][purge] on `tailwind.config.js` for production build.
 
 ## Reference
 
@@ -348,5 +334,4 @@ https://github.com/trungk18/angular-tailwind-css-configuration
 [step8]: https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-08.png
 [step9]: https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-09.png
 [scssandpostcss]: https://hashnode.com/post/difference-of-postcss-and-scss-cjaw5cm0f02nuxmwtl4qrk5sj
-[postcss-purgecss]: https://github.com/FullHuman/purgecss/tree/master/packages/postcss-purgecss
-[whitelister]: https://github.com/qodesmith/purgecss-whitelister
+[purge]: https://tailwindcss.com/docs/controlling-file-size/#setting-up-purgecss
