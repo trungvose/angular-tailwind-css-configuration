@@ -4,7 +4,7 @@ A step by step tutorial for configuration TailwindCSS with Angular application.
 
 ![How to configure TailwindCSS with Angular](https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-07.gif)
 
-I also post this tutorial on my personal blog page. 
+I also post this tutorial on my personal blog page.
 
 https://trungk18.com/experience/configure-tailwind-css-with-angular
 
@@ -12,6 +12,10 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
 
 ## Table Of Content
 
+- [angular-tailwind-css-configuration](#angular-tailwind-css-configuration)
+  - [Table Of Content](#table-of-content)
+  - [Update Aug 2020](#update-aug-2020)
+    - [Usage](#usage)
   - [Problem](#problem)
     - [1. Quick and dirty way: inline style](#1-quick-and-dirty-way-inline-style)
     - [2. Create a new class for each element, such as](#2-create-a-new-class-for-each-element-such-as)
@@ -33,6 +37,24 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
   - [Notes](#notes)
   - [Reference](#reference)
 
+## Update Aug 2020
+
+My friend [@nartc](https://github.com/nartc) Just released an @angular schematics to add @tailwindcss to your @angular/cli projects.
+
+- Setup Custom Webpack
+- Setup PurgeCSS
+- Update angular.json and styles.
+
+### Usage
+
+Simple run a single command on your Angular CLI project and you are all set!
+
+```bash
+ng add @nartc/tailwind-schematics
+```
+
+See more ➡ https://www.npmjs.com/package/@nartc/tailwind-schematics
+
 ## Problem
 
 Everyone has a different way of organizing and working with CSS. I always encounter some use case where I need to set a simple `padding-left: 5px`, or `margin: 0 auto`, or to make an element to have `cursor: pointer`.
@@ -49,8 +71,7 @@ I have a few options for doing so.
 ### 2. Create a new class for each element, such as
 
 ```html
-<button class="my-button">Submit</button>
-<i class="fa fa-help my-icon"></i>
+<button class="my-button">Submit</button> <i class="fa fa-help my-icon"></i>
 ```
 
 And write a corresponding CSS for them.
@@ -154,7 +175,7 @@ module.exports = {
           plugins: () => [
             require("postcss-import"),
             require("tailwindcss"),
-            require("autoprefixer")            
+            require("autoprefixer"),
           ],
         },
       },
@@ -163,7 +184,7 @@ module.exports = {
 };
 ```
 
->  I have some notes on `Tailwind bundle size` and `postcss-scss` for you
+> I have some notes on `Tailwind bundle size` and `postcss-scss` for you
 
 #### Controlling file size with Tailwind
 
@@ -178,10 +199,10 @@ To enable purge, simple add this option in your `tailwind.config.js`
 module.exports = {
   purge: {
     enabled: true,
-    content: ['./src/**/*.html', './src/**/*.ts'],
+    content: ["./src/**/*.html", "./src/**/*.ts"],
   },
   // ...
-}
+};
 ```
 
 For more on that, [view Tailwind documentation][purge].
@@ -192,7 +213,6 @@ For more on that, [view Tailwind documentation][purge].
 <img alt="How to configure TailwindCSS with Angular" src="https://gitlab.com/trungk181/blog/-/raw/master/img/blog/angular-tailwind-10.png">
 
 </details>
-
 
 #### postcss-scss
 
