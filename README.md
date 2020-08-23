@@ -2,7 +2,7 @@
 
 A step by step tutorial for configuration TailwindCSS with Angular application.
 
-![How to configure TailwindCSS with Angular](/img/blog/angular-tailwind-07.gif)
+![How to configure TailwindCSS with Angular](https://trungk18.com/img/blog/angular-tailwind-07.gif)
 
 I also post this tutorial on my personal blog page.
 
@@ -154,7 +154,7 @@ Next, you need to add the following to the top of the `/src/style.scss`.
 <details>
 <summary>View the screenshot</summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="/img/blog/angular-tailwind-03.png">
+<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-03.png">
 
 </details>
 
@@ -210,7 +210,7 @@ For more on that, [view Tailwind documentation][purge].
 <details>
 <summary>View the screenshot - See the CSS bundle size different between <u>1 MB</u> and <u>2 KB</u></summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="/img/blog/angular-tailwind-10.png">
+<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-10.png">
 
 </details>
 
@@ -225,7 +225,7 @@ I am using `postcss-loader` for webpack instead of just purely `scss-loader`. Bu
 <details>
 <summary>View the screenshot</summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="/img/blog/angular-tailwind-04.png">
+<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-04.png">
 
 </details>
 
@@ -344,14 +344,14 @@ https://github.com/trungk18/angular-tailwind-css-configuration
 [source]: https://github.com/trungk18/angular-tailwind-css-configuration
 [ref]: https://dev.to/seankerwin/angular-8-tailwind-css-guide-3m45
 [refau]: https://dev.to/seankerwin
-[step1]: /img/blog/angular-tailwind-01.png
-[step2]: /img/blog/angular-tailwind-02.png
-[step3]: /img/blog/angular-tailwind-03.png
-[step4]: /img/blog/angular-tailwind-04.png
-[step5]: /img/blog/angular-tailwind-05.png
-[step6]: /img/blog/angular-tailwind-06.png
-[step7]: /img/blog/angular-tailwind-07.gif
-[step8]: /img/blog/angular-tailwind-08.png
-[step9]: /img/blog/angular-tailwind-09.png
+[step1]: https://trungk18.com/img/blog/angular-tailwind-01.png
+[step2]: https://trungk18.com/img/blog/angular-tailwind-02.png
+[step3]: https://trungk18.com/img/blog/angular-tailwind-03.png
+[step4]: https://trungk18.com/img/blog/angular-tailwind-04.png
+[step5]: https://trungk18.com/img/blog/angular-tailwind-05.png
+[step6]: https://trungk18.com/img/blog/angular-tailwind-06.png
+[step7]: https://trungk18.com/img/blog/angular-tailwind-07.gif
+[step8]: https://trungk18.com/img/blog/angular-tailwind-08.png
+[step9]: https://trungk18.com/img/blog/angular-tailwind-09.png
 [scssandpostcss]: https://hashnode.com/post/difference-of-postcss-and-scss-cjaw5cm0f02nuxmwtl4qrk5sj
 [purge]: https://tailwindcss.com/docs/controlling-file-size/#setting-up-purgecss
