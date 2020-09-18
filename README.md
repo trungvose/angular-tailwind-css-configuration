@@ -14,6 +14,7 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
 
 - [angular-tailwind-css-configuration](#angular-tailwind-css-configuration)
   - [Table Of Content](#table-of-content)
+  - [Integrate with SCSS](#integrate-with-scss)
   - [Update Aug 2020](#update-aug-2020)
     - [Usage](#usage)
   - [Problem](#problem)
@@ -37,6 +38,10 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
   - [Notes](#notes)
   - [Reference](#reference)
 
+## Integrate with SCSS
+
+I used this approach to apply on one of my project with SCSS. You can see the source code there ➡ https://github.com/trungk18/jira-clone-angular
+
 ## Update Aug 2020
 
 My friend [@nartc](https://github.com/nartc) Just released an @angular schematics to add @tailwindcss to your @angular/cli projects.
@@ -50,10 +55,10 @@ My friend [@nartc](https://github.com/nartc) Just released an @angular schematic
 Simple run a single command on your Angular CLI project and you are all set!
 
 ```bash
-ng add @nartc/tailwind-schematics
+ng add @ngneat/tailwind
 ```
 
-See more ➡ https://www.npmjs.com/package/@nartc/tailwind-schematics
+See more ➡ https://github.com/ngneat/tailwind
 
 ## Problem
 
@@ -290,7 +295,7 @@ Tailwind provides a very useful `@apply` keyword. Think about If you have 10 sim
 
 ```html
 <button
-  class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+  class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
 >
   Submit
 </button>
