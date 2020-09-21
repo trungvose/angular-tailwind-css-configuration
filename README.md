@@ -2,7 +2,7 @@
 
 A step by step tutorial for configuration TailwindCSS with Angular application.
 
-![How to configure TailwindCSS with Angular](https://trungk18.com/img/blog/angular-tailwind-07.gif)
+![How to configure TailwindCSS with Angular](/images/07.gif)
 
 I also post this tutorial on my personal blog page.
 
@@ -10,11 +10,9 @@ https://trungk18.com/experience/configure-tailwind-css-with-angular
 
 TL;DR: This configuration is tested on Angular 9. It is also working on the previous version of Angular such as 8.x.x. It is also working with AOT when you do `ng build --aot=true`
 
-## Table Of Content
+## Table Of Contents
 
 - [angular-tailwind-css-configuration](#angular-tailwind-css-configuration)
-  - [Table Of Content](#table-of-content)
-  - [Integrate with SCSS](#integrate-with-scss)
   - [Update Aug 2020](#update-aug-2020)
     - [Usage](#usage)
   - [Problem](#problem)
@@ -26,6 +24,8 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
     - [2. Install TailwindCSS package and dependencies needed](#2-install-tailwindcss-package-and-dependencies-needed)
     - [3. Import Tailwind CSS to your style.scss](#3-import-tailwind-css-to-your-stylescss)
     - [4. Create a webpack.config.js file at the root of your project](#4-create-a-webpackconfigjs-file-at-the-root-of-your-project)
+      - [This is what it should look like for `postcss-loader@^3.0`](#this-is-what-it-should-look-like-for-postcss-loader30)
+      - [If you are using `postcss-loader@^4.0`, take this config instead](#if-you-are-using-postcss-loader40-take-this-config-instead)
       - [Controlling file size with Tailwind](#controlling-file-size-with-tailwind)
       - [postcss-scss](#postcss-scss)
     - [5. Modify the angular.json file to use the custom builder and the webpack config file](#5-modify-the-angularjson-file-to-use-the-custom-builder-and-the-webpack-config-file)
@@ -38,17 +38,14 @@ TL;DR: This configuration is tested on Angular 9. It is also working on the prev
   - [Notes](#notes)
   - [Reference](#reference)
 
-## Integrate with SCSS
-
-I used this approach to apply on one of my project with SCSS. You can see the source code there ➡ https://github.com/trungk18/jira-clone-angular
-
 ## Update Aug 2020
 
 My friend [@nartc](https://github.com/nartc) Just released an @angular schematics to add @tailwindcss to your @angular/cli projects.
 
 - Setup Custom Webpack
 - Setup PurgeCSS
-- Update angular.json and styles.
+- Update angular.json and styles
+- Support Nx Workspace
 
 ### Usage
 
@@ -134,7 +131,7 @@ Suppose you have already had an Angular application create with Angular CLI, fol
 
 On Windows, simple type `cd path/to/your/folder`.
 
-![How to configure TailwindCSS with Angular][step1]
+![How to configure TailwindCSS with Angular](./images/01.png)
 
 ### 2. Install TailwindCSS package and dependencies needed
 
@@ -144,7 +141,7 @@ npm i tailwindcss postcss-scss postcss-import postcss-loader @angular-builders/c
 
 We will need `@angular-builders/custom-webpack` for customizing the build process of Angular CLI by overriding some of the webpack configurations.
 
-![How to configure TailwindCSS with Angular][step2]
+![How to configure TailwindCSS with Angular](./images/02.png)
 
 ### 3. Import Tailwind CSS to your style.scss
 
@@ -159,13 +156,13 @@ Next, you need to add the following to the top of the `/src/style.scss`.
 <details>
 <summary>View the screenshot</summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-03.png">
+<img alt="How to configure TailwindCSS with Angular" src="./03.png">
 
 </details>
 
 ### 4. Create a webpack.config.js file at the root of your project
 
-This is what it should look like:
+#### This is what it should look like for `postcss-loader@^3.0`
 
 ```javascript
 module.exports = {
@@ -182,6 +179,30 @@ module.exports = {
             require("tailwindcss"),
             require("autoprefixer"),
           ],
+        },
+      },
+    ],
+  },
+};
+```
+
+#### If you are using `postcss-loader@^4.0`, take this config instead
+
+Noted there is additional `postcssOptions` property inside options. See the detail from [its documentation](https://webpack.js.org/loaders/postcss-loader/)
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        loader: "postcss-loader",
+        options: {
+          postcssOptions: {
+            ident: "postcss",
+            syntax: "postcss-scss",
+            plugins: ["postcss-import", "tailwindcss", "autoprefixer"],
+          },
         },
       },
     ],
@@ -215,22 +236,26 @@ For more on that, [view Tailwind documentation][purge].
 <details>
 <summary>View the screenshot - See the CSS bundle size different between <u>1 MB</u> and <u>2 KB</u></summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-10.png">
+<img alt="How to configure TailwindCSS with Angular" src="./10.png">
 
 </details>
 
 #### postcss-scss
 
-It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `variables` as properties, so that PostCSS plugins can then transform SCSS source code alongside CSS. Mixin and for loop won't be transformed. I tried to add `sass-loader`. But when I do for loop, it only transform the first and the last item of the list. Super weird :))
+It will <u>not compile SCSS</u>. It simply parses mixins as custom at-rules & `variables` as properties, so that PostCSS plugins can then transform SCSS source code alongside CSS. Mixin and for loop won't be transformed. You have to use `sass-loader` or `less-loader` if you need to compiled your SASS/LESS code into CSS then do the `postcss-loader` on top of that.
 
-I am using `postcss-loader` for webpack instead of just purely `scss-loader`. But you might ask, [what is different between SCSS and PostCSS][scssandpostcss]?
+See my [webpack.config.js][webpack] for project [jira-clone-angular][jira] that use additional `sass-loader`
 
-> PostCSS is the closest thing in the CSS world to what 'Babel' is in the JavaScript world - it parses CSS, loads plugins that apply transformations to your code, and manages these transformations. SCSS a preprocessor and can be loaded by PostCSS, but PostCSS has the ability to load a lot more than just SCSS :D With PostCSS you could manage SCSS and Less and Stylus code, plus other things - all in the same codebase together.
+But you might ask, [what is different between SCSS and PostCSS][scssandpostcss]?
+
+> PostCSS is the closest thing in the CSS world to what 'Babel' is in the JavaScript world - it parses CSS, loads plugins that apply transformations to your code, and manages these transformations. SCSS is a preprocessor and can be loaded by PostCSS, but PostCSS has the ability to load a lot more than just SCSS :D With PostCSS you could manage SCSS and Less and Stylus code, plus other things - all in the same codebase together.
+
+I still didn't really get what is PostCSS 😂 **In short, To make SCSS/LESS work with PostCSS, please config your `webpack.config.js` with additional needed loader as [I mentioned above][webpack]**.
 
 <details>
 <summary>View the screenshot</summary>
 
-<img alt="How to configure TailwindCSS with Angular" src="https://trungk18.com/img/blog/angular-tailwind-04.png">
+<img alt="How to configure TailwindCSS with Angular" src="./04.png">
 
 </details>
 
@@ -261,19 +286,19 @@ I am using `postcss-loader` for webpack instead of just purely `scss-loader`. Bu
 
 **Important**, see the `"builder"` has been changed from `@angular-devkit/build-angular:dev-server` to `@angular-builders/custom-webpack:browser`.
 
-![How to configure TailwindCSS with Angular][step5]
+![How to configure TailwindCSS with Angular](./images/05.png)
 
 ### 6. We are finished
 
 Run `npm start` and start adding some Tailwind classes to see if it is working.
 
-![How to configure TailwindCSS with Angular][step6]
+![How to configure TailwindCSS with Angular](./images/06.png)
 
 ## Configure to use TailwindCSS effectively in VSCode
 
 Tailwind is great. But with hundreds of utility classes might not be easy to remember. We can configure VSCode to give us all the suggestions for Tailwind.
 
-![How to configure TailwindCSS with Angular][step7]
+![How to configure TailwindCSS with Angular](./images/07.gif)
 
 To do so, follow these steps.
 
@@ -285,7 +310,7 @@ https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
 
 Simple run `npx tailwind init`. It will give you a default configuration file `tailwind.config.js`. This extension required this file to be able to work properly.
 
-![How to configure TailwindCSS with Angular][step8]
+![How to configure TailwindCSS with Angular](./images/08.png)
 
 That's all. You can now use the power of VSCode together with Tailwind, how sweet it is!
 
@@ -306,9 +331,7 @@ If you need to change the color, you also have to change 10 times. Which is a ni
 With `@apply`, you can create a new class `.btn` and put all the style you want to reuse. Our code will be transformed into below.
 
 ```html
-<button class="btn-tailwind">
-  Submit
-</button>
+<button class="btn-tailwind">Submit</button>
 ```
 
 ```scss
@@ -321,7 +344,7 @@ With `@apply`, you can create a new class `.btn` and put all the style you want 
 }
 ```
 
-![How to configure TailwindCSS with Angular][step9]
+![How to configure TailwindCSS with Angular](./images/09.png)
 
 The output looks the same as we use classes. For more information on `@apply`.
 
@@ -349,14 +372,17 @@ https://github.com/trungk18/angular-tailwind-css-configuration
 [source]: https://github.com/trungk18/angular-tailwind-css-configuration
 [ref]: https://dev.to/seankerwin/angular-8-tailwind-css-guide-3m45
 [refau]: https://dev.to/seankerwin
-[step1]: https://trungk18.com/img/blog/angular-tailwind-01.png
-[step2]: https://trungk18.com/img/blog/angular-tailwind-02.png
-[step3]: https://trungk18.com/img/blog/angular-tailwind-03.png
-[step4]: https://trungk18.com/img/blog/angular-tailwind-04.png
-[step5]: https://trungk18.com/img/blog/angular-tailwind-05.png
-[step6]: https://trungk18.com/img/blog/angular-tailwind-06.png
-[step7]: https://trungk18.com/img/blog/angular-tailwind-07.gif
-[step8]: https://trungk18.com/img/blog/angular-tailwind-08.png
-[step9]: https://trungk18.com/img/blog/angular-tailwind-09.png
 [scssandpostcss]: https://hashnode.com/post/difference-of-postcss-and-scss-cjaw5cm0f02nuxmwtl4qrk5sj
 [purge]: https://tailwindcss.com/docs/controlling-file-size/#setting-up-purgecss
+[jira]: https://jira.trungk18.com/
+[webpack]: https://github.com/trungk18/jira-clone-angular/blob/master/frontend/webpack.config.js
+[refau]: https://dev.to/seankerwin
+[step1]: /images/01.png
+[step2]: /images/02.png
+[step3]: /images/03.png
+[step4]: /images/04.png
+[step5]: /images/05.png
+[step6]: /images/06.png
+[step7]: /images/07.gif
+[step8]: /images/08.png
+[step9]: /images/09.png
